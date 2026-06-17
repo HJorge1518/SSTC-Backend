@@ -8,6 +8,8 @@ import isw.backend.dto.InformeTecnicoResponse;
 import isw.backend.dto.SolicitudRepuestoRequest;
 import isw.backend.dto.SolicitudRepuestoResponse;
 import isw.backend.service.IncidenciaService;
+import isw.backend.service.InformeTecnicoService;
+import isw.backend.service.SolicitudRepuestoService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -24,9 +26,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/incidencias")
 public class IncidenciaController {
     private final IncidenciaService incidenciaService;
+    private final SolicitudRepuestoService solicitudRepuestoService;
+    private final InformeTecnicoService informeTecnicoService;
 
-    public IncidenciaController(IncidenciaService incidenciaService) {
+    public IncidenciaController(
+            IncidenciaService incidenciaService,
+            SolicitudRepuestoService solicitudRepuestoService,
+            InformeTecnicoService informeTecnicoService
+    ) {
         this.incidenciaService = incidenciaService;
+        this.solicitudRepuestoService = solicitudRepuestoService;
+        this.informeTecnicoService = informeTecnicoService;
     }
 
     @GetMapping
@@ -60,14 +70,14 @@ public class IncidenciaController {
             @PathVariable Long id,
             @Valid @RequestBody SolicitudRepuestoRequest request
     ) {
-        SolicitudRepuestoResponse response = incidenciaService.solicitarRepuesto(id, request);
+        SolicitudRepuestoResponse response = solicitudRepuestoService.solicitarRepuesto(id, request);
         return ResponseEntity.created(URI.create("/api/v1/incidencias/" + id + "/solicitudes-repuesto/" + response.id()))
                 .body(response);
     }
 
     @GetMapping("/{id}/solicitudes-repuesto")
     public List<SolicitudRepuestoResponse> listarSolicitudes(@PathVariable Long id) {
-        return incidenciaService.listarSolicitudes(id);
+        return solicitudRepuestoService.listarSolicitudes(id);
     }
 
     @PostMapping("/{id}/informe")
@@ -75,7 +85,7 @@ public class IncidenciaController {
             @PathVariable Long id,
             @Valid @RequestBody InformeTecnicoRequest request
     ) {
-        InformeTecnicoResponse response = incidenciaService.registrarInforme(id, request);
+        InformeTecnicoResponse response = informeTecnicoService.registrarInforme(id, request);
         return ResponseEntity.created(URI.create("/api/v1/incidencias/" + id + "/informe")).body(response);
     }
 }
